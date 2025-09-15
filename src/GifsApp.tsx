@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { GifList } from "./gifs/components/GifList";
 import { PreviousSearches } from "./gifs/components/PreviousSearches";
-import { mockGifs } from "./mock-data/gifs-mock";
+// import { mockGifs } from "./mock-data/gifs-mock";
 import { CustomeHeader } from "./shared/components/CustomeHeader";
 import { SearchBar } from "./shared/components/SearchBar";
+import { getGifsByQuery } from "./gifs/actions/get-gifs-by-query.action";
+import type { Gif } from "./gifs/interfaces/gif.interface";
 
 export const GifsApp = () => {
-  const [previousTerms, setPreviousTerms] = useState([
-    "Mario Bros",
-    "dragon ball",
-  ]);
+  const [previousTerms, setPreviousTerms] = useState<string[]>([]);
+  const [gifs, setGifs] = useState<Gif[]>([])
   const handleClickedTerm = (term: string) => {
     console.log(term);
   };
 
-  const handleSearch = (query: string = "") => {
+  const handleSearch = async (query: string = "") => {
     const clearQuery = query.trim().toLocaleLowerCase();
     if (clearQuery.length === 0) return;
     const clearTerms = previousTerms.map((term) => {
@@ -28,7 +28,9 @@ export const GifsApp = () => {
         3
       )
     );
-    console.log(clearQuery, clearTerms);
+    const gifs = await getGifsByQuery(query);
+    setGifs(gifs)
+
   };
 
   return (
@@ -43,7 +45,7 @@ export const GifsApp = () => {
         searches={previousTerms}
         onLabelClicked={handleClickedTerm}
       />
-      <GifList gifs={mockGifs} />
+      <GifList gifs={gifs} />
     </>
   );
 };
